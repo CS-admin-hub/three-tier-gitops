@@ -1,0 +1,66 @@
+# k8s_manifests/security/kyverno-policies.yaml
+# Admission control - these policies BLOCK non-compliant pods from deploying
+apiVersion: kyverno.io/v1
+# Policy 1: All containers MUST have resource limits
+
+kind: ClusterPolicy
+metadata:
+  name: require-resource-limits
+spec:
+  validationFailureAction: enforce
+  rules:
+    - name: check-resource-limits
+      match:
+        resources:
+          kinds: [Pod]
+      validate:
+        message: "Resource limits are required for all containers"
+        pattern:
+          spec:
+            containers:
+              - resources:
+                  limits:
+                    memory: "?*"
+                    cpu: "?*"
+
+# Policy 2: No containers running as root
+---
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: disallow-root-user
+spec:
+  validationFailureAction: enforce
+  rules:
+    - name: check-runasnonroot
+      match:
+        resources:
+          kinds: [Pod]
+      validate:
+        message: "Containers must not run as root"
+        pattern:
+          spec:
+            containers:
+              - securityContext:
+                  runAsNonRoot: true
+
+# NOTE: Replace 851725602228 before applying
+---
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: allowed-image-registries
+spec:
+  validationFailureAction: enforce
+  rules:
+    - name: check-image-registry
+      match:
+        resources:
+          kinds: [Pod]
+          namespaces: [workshop]
+      validate:
+        message: "Images must be from ECR or approved public registries"
+        pattern:
+          spec:
+            containers:
+              - image: "851725602228.dkr.ecr.us-east-1.amazonaws.com/* | mongo:* | prom/* | grafana/*"

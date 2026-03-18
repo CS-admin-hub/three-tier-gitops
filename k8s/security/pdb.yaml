@@ -1,0 +1,22 @@
+# k8s_manifests/pdb/pdb.yaml
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: frontend-pdb
+  namespace: workshop
+spec:
+  minAvailable: 1 # At least 1 frontend pod always up during node drain
+  selector:
+    matchLabels:
+      role: frontend
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: backend-pdb
+  namespace: workshop
+spec:
+  minAvailable: 1 # At least 1 backend pod always up during node drain
+  selector:
+    matchLabels:
+      role: backend

@@ -1,0 +1,90 @@
+# k8s_manifests/security/network-policies.yaml
+# Locks down pod-to-pod traffic: Frontend→Backend→MongoDB only. Nothing else.
+apiVersion: networking.k8s.io/v1
+# POLICY 1: Frontend can only receive from ALB, can only talk to Backend
+
+kind: NetworkPolicy
+metadata:
+  name: frontend-policy
+  namespace: workshop
+spec:
+  podSelector:
+    matchLabels:
+      role: frontend
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system # ALB health checks
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              role: backend
+      ports:
+        - protocol: TCP
+          port: 8080
+    - to: # Allow DNS resolution
+        - namespaceSelector: {}
+      ports:
+        - protocol: UDP
+          port: 53
+
+# POLICY 2: Backend can only receive from Frontend, can only talk to MongoDB
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: backend-policy
+  namespace: workshop
+spec:
+  podSelector:
+    matchLabels:
+      role: backend
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              role: frontend
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: mongodb
+      ports:
+        - protocol: TCP
+          port: 27017
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: UDP
+          port: 53
+
+# POLICY 3: MongoDB only accepts connections from Backend
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: mongodb-policy
+  namespace: workshop
+spec:
+  podSelector:
+    matchLabels:
+      app: mongodb
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              role: backend

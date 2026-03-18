@@ -1,0 +1,35 @@
+# k8s_manifests/security/resource-quota.yaml
+# Prevents any single namespace from consuming all cluster resources
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: workshop-quota
+  namespace: workshop
+spec:
+  hard:
+    requests.cpu: "4"
+    requests.memory: 4Gi
+    limits.cpu: "8"
+    limits.memory: 8Gi
+    pods: "20"
+    persistentvolumeclaims: "5"
+
+# Default limits applied to pods that don't specify their own
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: workshop-limitrange
+  namespace: workshop
+spec:
+  limits:
+    - type: Container
+      default:
+        cpu: "200m"
+        memory: "256Mi"
+      defaultRequest:
+        cpu: "100m"
+        memory: "128Mi"
+      max:
+        cpu: "1"
+        memory: "1Gi"
