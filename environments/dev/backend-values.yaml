@@ -1,5 +1,5 @@
 replicaCount: 2
 image:
   repository: 851725602228.dkr.ecr.us-east-1.amazonaws.com/three-tier-backend
-  tag: 4e2da49
+  tag: "7412048"
   pullPolicy: IfNotPresent
