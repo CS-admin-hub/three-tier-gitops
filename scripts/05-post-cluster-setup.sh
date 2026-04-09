@@ -45,7 +45,7 @@ sed "s|851725602228|${AWS_ACCOUNT_ID}|g; s|<OIDC_URL>|${OIDC_URL}|g" \
 create_role_if_not_exists() {
   local ROLE_NAME=$1
   local TRUST_FILE=$2
-  if aws iam get-role --role-name ${ROLE_NAME} 2>/dev/null; then
+  if aws iam get-role --role-name ${ROLE_NAME} 2>/stage/null; then
     echo "  Role ${ROLE_NAME} already exists - skipping create"
   else
     aws iam create-role --role-name ${ROLE_NAME} \

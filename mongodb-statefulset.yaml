@@ -86,7 +86,7 @@ spec:
           allowPrivilegeEscalation: false
           runAsNonRoot: true
           runAsUser: 999
-        terminationMessagePath: /dev/termination-log
+        terminationMessagePath: /stage/termination-log
         terminationMessagePolicy: File
         volumeMounts:
         - mountPath: /data/db

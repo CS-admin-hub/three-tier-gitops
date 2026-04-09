@@ -3,7 +3,7 @@ name: Build and Push to ECR + GitOps Update
 on:
   push:
     branches:
-      - dev
+      - stage
       # - main   # enable after testing
 
 permissions:
@@ -84,7 +84,7 @@ jobs:
       # ======================
       - name: Clone GitOps Repo
         run: |
-          git clone --branch dev https://x-access-token:${{ secrets.GITOPS_TOKEN }}@github.com/CS-admin-hub/three-tier-gitops.git
+          git clone --branch stage https://x-access-token:${{ secrets.GITOPS_TOKEN }}@github.com/CS-admin-hub/three-tier-gitops.git
           echo "=== VERIFY CLONE ==="
           ls -R three-tier-gitops
 
@@ -99,38 +99,38 @@ jobs:
           echo "Using IMAGE_TAG: $IMAGE_TAG"
 
           echo "=== UPDATING FRONTEND ==="
-          if [ -f environments/dev/frontend-values.yaml ]; then
-            CURRENT_TAG=$(./yq eval '.image.tag' environments/dev/frontend-values.yaml)
+          if [ -f environments/stage/frontend-values.yaml ]; then
+            CURRENT_TAG=$(./yq eval '.image.tag' environments/stage/frontend-values.yaml)
             echo "Current frontend tag: $CURRENT_TAG"
 
-            ./yq eval ".image.tag = \"$IMAGE_TAG\"" -i environments/dev/frontend-values.yaml
+            ./yq eval ".image.tag = \"$IMAGE_TAG\"" -i environments/stage/frontend-values.yaml
 
-            NEW_TAG=$(./yq eval '.image.tag' environments/dev/frontend-values.yaml)
+            NEW_TAG=$(./yq eval '.image.tag' environments/stage/frontend-values.yaml)
             echo "New frontend tag: $NEW_TAG"
           else
             echo " Frontend file not found"
-            ls -la environments/dev/
+            ls -la environments/stage/
           fi
 
           echo "=== UPDATING BACKEND ==="
-          if [ -f environments/dev/backend-values.yaml ]; then
-            CURRENT_TAG=$(./yq eval '.image.tag' environments/dev/backend-values.yaml)
+          if [ -f environments/stage/backend-values.yaml ]; then
+            CURRENT_TAG=$(./yq eval '.image.tag' environments/stage/backend-values.yaml)
             echo "Current backend tag: $CURRENT_TAG"
 
-            ./yq eval ".image.tag = \"$IMAGE_TAG\"" -i environments/dev/backend-values.yaml
+            ./yq eval ".image.tag = \"$IMAGE_TAG\"" -i environments/stage/backend-values.yaml
 
-            NEW_TAG=$(./yq eval '.image.tag' environments/dev/backend-values.yaml)
+            NEW_TAG=$(./yq eval '.image.tag' environments/stage/backend-values.yaml)
             echo "New backend tag: $NEW_TAG"
           else
             echo " Backend file not found"
-            ls -la environments/dev/
+            ls -la environments/stage/
           fi
 
           echo "=== FINAL VERIFICATION ==="
           echo "--- Frontend values ---"
-          cat environments/dev/frontend-values.yaml
+          cat environments/stage/frontend-values.yaml
           echo "--- Backend values ---"
-          cat environments/dev/backend-values.yaml
+          cat environments/stage/backend-values.yaml
 
       #   - name: Update Image Tag in Values Files
     #     run: |

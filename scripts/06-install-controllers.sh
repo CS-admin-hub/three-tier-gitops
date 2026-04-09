@@ -19,7 +19,7 @@ eksctl create iamserviceaccount \
   --override-existing-serviceaccounts \
   --approve --region ${AWS_DEFAULT_REGION}
 
-helm repo add karpenter https://charts.karpenter.sh/ 2>/dev/null || true
+helm repo add karpenter https://charts.karpenter.sh/ 2>/stage/null || true
 helm repo update
 
 helm install karpenter oci://public.ecr.aws/karpenter/karpenter \
@@ -44,7 +44,7 @@ echo "  NodePool applied"
 
 # --- 2. Metrics Server ---
 echo ">>> Checking Metrics Server..."
-if kubectl get deployment metrics-server -n kube-system 2>/dev/null; then
+if kubectl get deployment metrics-server -n kube-system 2>/stage/null; then
   echo "  Metrics Server already installed - skipping"
 else
   kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
@@ -59,7 +59,7 @@ curl -O https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-cont
 
 aws iam create-policy \
   --policy-name AWSLoadBalancerControllerIAMPolicy \
-  --policy-document file://iam_policy.json 2>/dev/null || \
+  --policy-document file://iam_policy.json 2>/stage/null || \
   echo "  ALB policy already exists - continuing"
 
 eksctl create iamserviceaccount \
@@ -71,7 +71,7 @@ eksctl create iamserviceaccount \
   --approve \
   --region=${AWS_DEFAULT_REGION}
 
-helm repo add eks https://aws.github.io/eks-charts 2>/dev/null || true
+helm repo add eks https://aws.github.io/eks-charts 2>/stage/null || true
 helm repo update
 
 helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
@@ -85,7 +85,7 @@ echo "  ALB Controller installed"
 
 # --- 4. External Secrets Operator ---
 echo ">>> Installing External Secrets Operator..."
-helm repo add external-secrets https://charts.external-secrets.io 2>/dev/null || true
+helm repo add external-secrets https://charts.external-secrets.io 2>/stage/null || true
 helm repo update
 
 helm install external-secrets external-secrets/external-secrets \
@@ -97,7 +97,7 @@ echo "  External Secrets Operator installed"
 
 # --- 5. Kyverno ---
 echo ">>> Installing Kyverno..."
-helm repo add kyverno https://kyverno.github.io/kyverno/ 2>/dev/null || true
+helm repo add kyverno https://kyverno.github.io/kyverno/ 2>/stage/null || true
 helm repo update
 
 helm install kyverno kyverno/kyverno \
