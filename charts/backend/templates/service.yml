@@ -1,0 +1,16 @@
+# k8s_manifests/backend/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: workshop
+  labels:
+    app: backend
+spec:
+  selector:
+    role: backend
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: ClusterIP

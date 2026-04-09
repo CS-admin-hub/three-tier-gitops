@@ -1,8 +1,0 @@
-# monitoring/01-namespace.yaml
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: monitoring
-  labels:
-    app.kubernetes.io/managed-by: kubectl
-    environment: production
