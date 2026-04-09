@@ -1,30 +1,30 @@
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: monitoring
-  namespace: argocd
-spec:
-  project: default
-  source:
-    repoURL: https://prometheus-community.github.io/helm-charts
-    chart: kube-prometheus-stack
-    targetRevision: 58.0.0 # stable version
-    helm:
-      values: |
-        grafana:
-          adminPassword: admin123
-          service:
-            type: ClusterIP
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   name: monitoring
+#   namespace: workshop
+# spec:
+#   project: default
+#   source:
+#     repoURL: https://prometheus-community.github.io/helm-charts
+#     chart: kube-prometheus-stack
+#     targetRevision: 58.0.0 # stable version
+#     helm:
+#       values: |
+#         grafana:
+#           adminPassword: admin123
+#           service:
+#             type: ClusterIP
 
-        prometheus:
-          prometheusSpec:
-            serviceMonitorSelectorNilUsesHelmValues: false
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: monitoring
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
+#         prometheus:
+#           prometheusSpec:
+#             serviceMonitorSelectorNilUsesHelmValues: false
+#   destination:
+#     server: https://kubernetes.default.svc
+#     namespace: monitoring
+#   syncPolicy:
+#     automated:
+#       prune: true
+#       selfHeal: true
+#     syncOptions:
+#       - CreateNamespace=true
