@@ -1,5 +1,5 @@
 replicaCount: 2
 image:
   repository: 851725602228.dkr.ecr.us-east-1.amazonaws.com/three-tier-frontend
-  tag: "20e479a"
+  tag: "26ec47a"
   pullPolicy: IfNotPresent
