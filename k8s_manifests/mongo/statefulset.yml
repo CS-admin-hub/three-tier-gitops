@@ -1,97 +1,4 @@
-# k8s_manifests/mongo/statefulset.yaml
-apiVersion: apps/v1
-kind: StatefulSet
-metadata:
-  name: mongodb
-  namespace: workshop
-spec:
-  serviceName: mongodb-svc
-  replicas: 1
-  selector:
-    matchLabels:
-      app: mongodb
-  template:
-    metadata:
-      labels:
-        app: mongodb
-      annotations:
-        prometheus.io/scrape: "false"
-    spec:
-      securityContext:
-        fsGroup: 999
-        fsGroupChangePolicy: OnRootMismatch
-      containers:
-        - name: mongodb
-          image: mongo:6.0
-          ports:
-            - containerPort: 27017
-          env:
-            - name: MONGO_INITDB_ROOT_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: mongodb-secret
-                  key: MONGO_USERNAME
-            - name: MONGO_INITDB_ROOT_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: mongodb-secret
-                  key: MONGO_PASSWORD
-            - name: MONGO_INITDB_DATABASE
-              valueFrom:
-                secretKeyRef:
-                  name: mongodb-secret
-                  key: MONGO_DATABASE
-          # livenessProbe commented out for now
-
-          # livenessProbe:
-          #   exec:
-          #     command:
-          #       - sh
-          #       - -c
-          #       - |
-          #         mongosh -u "$MONGO_INITDB_ROOT_USERNAME" -p "$MONGO_INITDB_ROOT_PASSWORD" --eval "db.adminCommand('ping')" --quiet
-          #   initialDelaySeconds: 30
-          #   periodSeconds: 10
-          #   timeoutSeconds: 5
-          #   failureThreshold: 3
-          # readinessProbe commented out for now  
-          # readinessProbe:
-          #   exec:
-          #     command:
-          #       - sh
-          #       - -c
-          #       - |
-          #         mongosh -u "$MONGO_INITDB_ROOT_USERNAME" -p "$MONGO_INITDB_ROOT_PASSWORD" --eval "db.adminCommand('ping')" --quiet
-          #   initialDelaySeconds: 5
-          #   periodSeconds: 5
-          #   timeoutSeconds: 5
-          #   failureThreshold: 3
-          resources:
-            requests:
-              memory: "256Mi"
-              cpu: "100m"
-            limits:
-              memory: "512Mi"
-              cpu: "300m"
-          securityContext:
-            runAsNonRoot: true
-            runAsUser: 999
-            allowPrivilegeEscalation: false
-          volumeMounts:
-            - name: mongo-data
-              mountPath: /data/db
-      terminationGracePeriodSeconds: 60
-  volumeClaimTemplates:
-    - metadata:
-        name: mongo-data
-      spec:
-        accessModes: [ReadWriteOnce]
-        volumeMode: Filesystem
-        storageClassName: gp3
-        resources:
-          requests:
-            storage: 10Gi
-
+# # k8s_manifests/mongo/statefulset.yaml
 # apiVersion: apps/v1
 # kind: StatefulSet
 # metadata:
@@ -104,7 +11,7 @@ spec:
 #     matchLabels:
 #       app: mongodb
 #   template:
-#     metadata:
+#     # metadata:
 #       labels:
 #         app: mongodb
 #       annotations:
@@ -134,28 +41,31 @@ spec:
 #                 secretKeyRef:
 #                   name: mongodb-secret
 #                   key: MONGO_DATABASE
-#           livenessProbe:
-#             exec:
-#               command:
-#                 - sh
-#                 - -c
-#                 - |
-#                   mongosh -u "$MONGO_INITDB_ROOT_USERNAME" -p "$MONGO_INITDB_ROOT_PASSWORD" --eval "db.adminCommand('ping')" --quiet
-#             initialDelaySeconds: 30
-#             periodSeconds: 10
-#             timeoutSeconds: 5
-#             failureThreshold: 3
-#           readinessProbe:
-#             exec:
-#               command:
-#                 - sh
-#                 - -c
-#                 - |
-#                   mongosh -u "$MONGO_INITDB_ROOT_USERNAME" -p "$MONGO_INITDB_ROOT_PASSWORD" --eval "db.adminCommand('ping')" --quiet
-#             initialDelaySeconds: 5
-#             periodSeconds: 5
-#             timeoutSeconds: 5
-#             failureThreshold: 3
+#           # livenessProbe commented out for now
+
+#           # livenessProbe:
+#           #   exec:
+#           #     command:
+#           #       - sh
+#           #       - -c
+#           #       - |
+#           #         mongosh -u "$MONGO_INITDB_ROOT_USERNAME" -p "$MONGO_INITDB_ROOT_PASSWORD" --eval "db.adminCommand('ping')" --quiet
+#           #   initialDelaySeconds: 30
+#           #   periodSeconds: 10
+#           #   timeoutSeconds: 5
+#           #   failureThreshold: 3
+#           # readinessProbe commented out for now  
+#           # readinessProbe:
+#           #   exec:
+#           #     command:
+#           #       - sh
+#           #       - -c
+#           #       - |
+#           #         mongosh -u "$MONGO_INITDB_ROOT_USERNAME" -p "$MONGO_INITDB_ROOT_PASSWORD" --eval "db.adminCommand('ping')" --quiet
+#           #   initialDelaySeconds: 5
+#           #   periodSeconds: 5
+#           #   timeoutSeconds: 5
+#           #   failureThreshold: 3
 #           resources:
 #             requests:
 #               memory: "256Mi"
@@ -181,3 +91,93 @@ spec:
 #         resources:
 #           requests:
 #             storage: 10Gi
+
+# # apiVersion: apps/v1
+# # kind: StatefulSet
+# # metadata:
+# #   name: mongodb
+# #   namespace: workshop
+# # spec:
+# #   serviceName: mongodb-svc
+# #   replicas: 1
+# #   selector:
+# #     matchLabels:
+# #       app: mongodb
+# #   template:
+# #     metadata:
+# #       labels:
+# #         app: mongodb
+# #       annotations:
+# #         prometheus.io/scrape: "false"
+# #     spec:
+# #       securityContext:
+# #         fsGroup: 999
+# #         fsGroupChangePolicy: OnRootMismatch
+# #       containers:
+# #         - name: mongodb
+# #           image: mongo:6.0
+# #           ports:
+# #             - containerPort: 27017
+# #           env:
+# #             - name: MONGO_INITDB_ROOT_USERNAME
+# #               valueFrom:
+# #                 secretKeyRef:
+# #                   name: mongodb-secret
+# #                   key: MONGO_USERNAME
+# #             - name: MONGO_INITDB_ROOT_PASSWORD
+# #               valueFrom:
+# #                 secretKeyRef:
+# #                   name: mongodb-secret
+# #                   key: MONGO_PASSWORD
+# #             - name: MONGO_INITDB_DATABASE
+# #               valueFrom:
+# #                 secretKeyRef:
+# #                   name: mongodb-secret
+# #                   key: MONGO_DATABASE
+# #           livenessProbe:
+# #             exec:
+# #               command:
+# #                 - sh
+# #                 - -c
+# #                 - |
+# #                   mongosh -u "$MONGO_INITDB_ROOT_USERNAME" -p "$MONGO_INITDB_ROOT_PASSWORD" --eval "db.adminCommand('ping')" --quiet
+# #             initialDelaySeconds: 30
+# #             periodSeconds: 10
+# #             timeoutSeconds: 5
+# #             failureThreshold: 3
+# #           readinessProbe:
+# #             exec:
+# #               command:
+# #                 - sh
+# #                 - -c
+# #                 - |
+# #                   mongosh -u "$MONGO_INITDB_ROOT_USERNAME" -p "$MONGO_INITDB_ROOT_PASSWORD" --eval "db.adminCommand('ping')" --quiet
+# #             initialDelaySeconds: 5
+# #             periodSeconds: 5
+# #             timeoutSeconds: 5
+# #             failureThreshold: 3
+# #           resources:
+# #             requests:
+# #               memory: "256Mi"
+# #               cpu: "100m"
+# #             limits:
+# #               memory: "512Mi"
+# #               cpu: "300m"
+# #           securityContext:
+# #             runAsNonRoot: true
+# #             runAsUser: 999
+# #             allowPrivilegeEscalation: false
+# #           volumeMounts:
+# #             - name: mongo-data
+# #               mountPath: /data/db
+# #       terminationGracePeriodSeconds: 60
+# #   volumeClaimTemplates:
+# #     - metadata:
+# #         name: mongo-data
+# #       spec:
+# #         accessModes: [ReadWriteOnce]
+# #         volumeMode: Filesystem
+# #         storageClassName: gp3
+# #         resources:
+# #           requests:
+# #             storage: 10Gi
